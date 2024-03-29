@@ -18,17 +18,31 @@ return require('packer').startup(function(use)
   use 'nvim-tree/nvim-web-devicons'
   use 'nvim-treesitter/nvim-treesitter'
   use 'nvim-lualine/lualine.nvim'
-  use 'williamboman/mason.nvim'
-  use 'williamboman/mason-lspconfig.nvim'
-  use 'neovim/nvim-lspconfig'
+  use {
+    'williamboman/mason.nvim',
+    'williamboman/mason-lspconfig.nvim',
+    'neovim/nvim-lspconfig',
+  }
   use 'MunifTanjim/nui.nvim'
   use 'rcarriga/nvim-notify'
   use "rebelot/kanagawa.nvim"
   use { "catppuccin/nvim", as = "catppuccin" }
-  use 'nvim-telescope/telescope.nvim'
-  use 'nvim-lua/plenary.nvim'
+  use {
+    'nvim-lua/plenary.nvim',
+    'nvim-telescope/telescope.nvim',
+    require = { {'nvim-lua/plenary.nvim'} }
+  }
+  use 'vim-test/vim-test'
   use 'fatih/vim-go'
   use 'kdheepak/lazygit.nvim'
+  use 'github/copilot.vim'
+  use 'kabouzeid/nvim-lspinstall'
+  use("hrsh7th/nvim-cmp")
+  use("hrsh7th/cmp-buffer")
+  use("hrsh7th/cmp-path")
+  use("L3MON4D3/LuaSnip") -- snippet engine
+  use("saadparwaiz1/cmp_luasnip") -- for autocompletion
+  use("rafamadriz/friendly-snippets") -- useful snippets
   -- My plugins here
   -- use 'foo1/bar1.nvim'
   -- use 'foo2/bar2.nvim'
