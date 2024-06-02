@@ -1,1 +1,5 @@
-vim.cmd("colorscheme catppuccin")
+require('onedark').setup {
+    style = 'deep'
+}
+require('onedark').load()
+--vim.cmd("colorscheme")
