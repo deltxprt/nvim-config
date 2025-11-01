@@ -1,114 +1,216 @@
-local ensure_packer = function()
-  local fn = vim.fn
-  local install_path = fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
-  if fn.empty(fn.glob(install_path)) > 0 then
-    fn.system({'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path})
-    vim.cmd [[packadd packer.nvim]]
-    return true
-  end
-  return false
-end
-
-local packer_bootstrap = ensure_packer()
-
-return require('packer').startup(function(use)
-  use 'wbthomason/packer.nvim'
+return {
   -- themes
-  use {
-    'navarasu/onedark.nvim',
-    'rebelot/kanagawa.nvim'
-  }
-
-  use 'folke/noice.nvim'
-  use 'nvim-tree/nvim-tree.lua'
-  use 'nvim-tree/nvim-web-devicons'
-  use {
-    'nvim-treesitter/nvim-treesitter',
-    run = function()
-        local ts_update = require('nvim-treesitter.install').update({ with_sync = true })
-        ts_update()
-    end,
-  }
-  use 'nvim-lualine/lualine.nvim'
-  use {
-    'williamboman/mason.nvim',
-    'williamboman/mason-lspconfig.nvim',
-    'neovim/nvim-lspconfig'
-  }
-  use 'MunifTanjim/nui.nvim'
-  use 'rcarriga/nvim-notify'
-  use {
-    'nvim-lua/plenary.nvim',
-    'nvim-telescope/telescope.nvim',
-    require = { {'nvim-lua/plenary.nvim'} }
-  }
-  use {
-    'rmagatti/goto-preview',
+  {
+    "catppuccin/nvim",                 -- or any colorscheme you prefer
+    name = "catppuccin",
+    priority = 1000,                    -- load before everything else
     config = function()
-      require('goto-preview').setup {}
-    end
-  }
-  -- go setup
-  use {
-    'vim-test/vim-test',
-    'fatih/vim-go',
-    'ray-x/guihua.lua',
-    'ray-x/go.nvim'
-  }
-  --use 'ray-x/go.nvim'
-  -- rust setup
-  use {
-    'simrat39/rust-tools.nvim'
-  }
-  use 'kdheepak/lazygit.nvim'
-  -- complete setup
-  use {
-    'hrsh7th/cmp-nvim-lsp',
-    "hrsh7th/cmp-buffer",
-    "hrsh7th/cmp-path",
-    'hrsh7th/cmp-nvim-lsp-signature-help',
-    'hrsh7th/cmp-vsnip',
-    'hrsh7th/vim-vsnip',
-  }
-  use {
-  'hrsh7th/nvim-cmp',
-  config = function ()
-    require'cmp'.setup {
-      snippet = {
-        expand = function(args)
-          require'luasnip'.lsp_expand(args.body)
-        end
-      },
+      require("core.plugin_config.colorscheme")
+    end,
+  },
 
-      sources = {
-        { name = 'luasnip' },
-        -- more sources
-      },
-    }
-    end
-  }
-  use {'L3MON4D3/LuaSnip'} -- snippet engine
-  use("saadparwaiz1/cmp_luasnip") -- for autocompletion
-  use("rafamadriz/friendly-snippets") -- useful snippets
-  use("ramilito/kubectl.nvim")
-  use("ThePrimeagen/harpoon")
-  use {
+  -- UI Helper
+  {
+    "folke/noice.nvim",
+    event = "VeryLazy",                 -- load after UI is ready
+    dependencies = { "MunifTanjim/nui.nvim", "rcarriga/nvim-notify" },
+    config = function()
+      require("core.plugin_config.noice")
+    end,
+  },
+  {
+    "nvim-lualine/lualine.nvim",
+    event = "VeryLazy",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    config = function()
+      require("core.plugin_config.lualine")
+    end,
+  },
+  {
+    "nvim-mini/mini.nvim",
+    name = "mini",
+    version = false,
+    config = function ()
+      require("core.plugin_config.mini")
+    end,
+  },
+
+  {
+    "rmagatti/logger.nvim",
+    name = "logger",
+  },
+
+  {
     "rcarriga/nvim-dap-ui",
-    requires = {
+    dependencies = {
       "mfussenegger/nvim-dap",
       "nvim-neotest/nvim-nio",
       "folke/neodev.nvim"
-    }
-  }
-  use("mfussenegger/nvim-dap")
-  use("theHamsta/nvim-dap-virtual-text")
-  -- My plugins here
-  -- use 'foo1/bar1.nvim'
-  -- use 'foo2/bar2.nvim'
+    },
+  },
 
-  -- Automatically set up your configuration after cloning packer.nvim
-  -- Put this at the end after all plugins
-  if packer_bootstrap then
-    require('packer').sync()
-  end
-end)
+  -- Synthax / parsing
+
+  {
+    "nvim-treesitter/nvim-treesitter",
+    build = ":TSUpdate",
+    lazy = false,
+    event = { "BufReadPost", "BufNewFile" },
+    dependencies = {
+      "rcarriga/nvim-notify"
+    },
+    config = function()
+      require("core.plugin_config.nvim-treesitter")
+    end,
+  },
+
+  -- LSP / completions
+
+  {
+    "williamboman/mason.nvim",
+    cmd = "Mason",
+    config = function ()
+      require("core.plugin_config.mason")
+    end
+  },
+
+  {
+    "neovim/nvim-lspconfig",
+    event = "BufReadPre",
+    dependencies = {
+      "williamboman/mason-lspconfig",
+      "jose-elias-alvarez/null-ls.nvim"
+    },
+    config = function ()
+      require("core.plugin_config.lsp_config")
+    end
+  },
+
+  {
+    "saghen/blink.cmp",
+    version = "1.*",
+    dependencies = {
+      { "rafamadriz/friendly-snippets" },
+      { "hrsh7th/nvim-cmp" },
+      { "hrsh7th/cmp-nvim-lsp" },
+      { "hrsh7th/cmp-buffer" },
+      { "hrsh7th/cmp-path" },
+      { "hrsh7th/cmp-nvim-lsp-signature-help" },
+    },
+  },
+
+  {
+    "saadparwaiz1/cmp_luasnip",
+    name = "luasnip"
+  },
+
+  -- Telescope
+
+  {
+    "nvim-telescope/telescope.nvim",
+    cmd = "Telescope",
+    dependencies = {
+      { "nvim-lua/plenary.nvim" }
+    },
+    config =  function ()
+      require("core.plugin_config.telescope")
+    end
+  },
+
+
+  -- Navigation
+
+  {
+    "nvim-neo-tree/neo-tree.nvim",
+    branch = "v3.x",
+    dependencies = { "nvim-lua/plenary.nvim", "nvim-tree/nvim-web-devicons", "MunifTanjim/nui.nvim" },
+    config = function()
+      require("core.plugin_config.neotree")
+    end,
+  },
+
+  {
+    "stevearc/oil.nvim",
+    cmd = "Oil",
+    dependencies = {
+      {"nvim-mini/mini.icons"}
+    },
+    config = function()
+      require("core.plugin_config.oil")
+    end,
+  },
+
+
+
+  -- Languages plugins
+
+    -- GO
+  {
+    "ray-x/go.nvim",
+    ft = "go",
+    dependencies = {
+      "vim-test/vim-test",
+      "ray-x/guihua.lua"
+    },
+    config = function ()
+      require("core.plugin_config.go")
+    end
+  },
+
+    -- rust
+  {
+    "simrat39/rust-tools.nvim",
+    ft = "rust"
+  },
+
+  -- DAP
+
+  {
+   "mfussenegger/nvim-dap",
+   event = "VeryLazy",
+   config = function ()
+     require("core.plugin_config.dap")
+   end
+  },
+
+  -- Miscelaneous
+  {
+    "kdheepak/lazygit.nvim",
+    name = "lazygit"
+  },
+
+  {
+    "rmagatti/goto-preview",
+    config = function ()
+      require("core.plugin_config.goto")
+    end
+  },
+
+  {
+    "ThePrimeagen/harpoon",
+    name = "harpoon"
+  },
+
+  {
+    "L3MON4D3/LuaSnip",
+    cmd = "Lua"
+  },
+
+  {
+    "theHamsta/nvim-dap-virtual-text"
+  },
+
+  {
+    "rest-nvim/rest.nvim",
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter",
+      opts = function (_, opts)
+        opts.ensure_installed = opts.ensure_installed or {}
+        table.insert(opts.ensure_installed, "http")
+      end,
+    },
+  },
+
+}
+
+
