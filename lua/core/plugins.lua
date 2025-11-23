@@ -9,6 +9,10 @@ return {
     end,
   },
 
+  {
+    "rebelot/kanagawa.nvim"
+  },
+
   -- UI Helper
   {
     "folke/noice.nvim",

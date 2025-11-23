@@ -1,5 +1,7 @@
-require("catppuccin").setup({
-  flavour = "mocha"
-})
+--require("catppuccin").setup({
+--  flavour = "mocha"
+--})
+--
+require("kanagawa").load("wave")
 
-vim.cmd.colorscheme "catppuccin"
+vim.cmd.colorscheme "kanagawa"
