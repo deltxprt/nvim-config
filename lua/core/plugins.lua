@@ -1,27 +1,14 @@
 return {
   -- themes
+
   {
-    "catppuccin/nvim",                 -- or any colorscheme you prefer
-    name = "catppuccin",
-    priority = 1000,                    -- load before everything else
-    config = function()
+    "rebelot/kanagawa.nvim",
+    config = function ()
       require("core.plugin_config.colorscheme")
     end,
   },
 
-  {
-    "rebelot/kanagawa.nvim"
-  },
-
   -- UI Helper
-  {
-    "folke/noice.nvim",
-    event = "VeryLazy",                 -- load after UI is ready
-    dependencies = { "MunifTanjim/nui.nvim" },
-    config = function()
-      require("core.plugin_config.noice")
-    end,
-  },
   {
     "nvim-lualine/lualine.nvim",
     event = "VeryLazy",
